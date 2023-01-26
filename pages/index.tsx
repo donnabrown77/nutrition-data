@@ -1,123 +1,223 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Select, { InputActionMeta } from "react-select";
+import axios from "axios";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Iframe from "react-iframe";
+import { IFoodOption } from "../utils/types";
 
-const inter = Inter({ subsets: ['latin'] })
+// TODO add readme
+// https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/
+// https://fdc.nal.usda.gov/api-key-signup.html
+// TODO create new git and github repository
+// TODO deploy to next.js
 
-export default function Home() {
+/**
+ * Index page
+ * @param props
+ * @returns  jsx for Home page
+ */
+export default function IndexPage(props) {
+  const [searchValue, setSearchValue] = useState("");
+  const [foodOptions, setFoodOptions] = useState<IFoodOption[]>([]);
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [menuIsOpen, setMenuIsOpen] = useState<boolean>();
+  const [fdcId, setFdcId] = useState(0);
+  const router = useRouter();
+
+  // www.joshwcomeau.com/react/the-perils-of-rehydration/
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+  if (!hasMounted) {
+    return null;
+  }
+
+  /**
+   * Takes the input from the selectbox and then uses
+   * axios to retrieve matching foods from the USDA database.
+   * @param food
+   * @returns
+   */
+  const performSearchRequest = async function foodSearch(food: string) {
+    const { data } = await axios.get(
+      `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${props.apikey}&query=${food}`
+    );
+    return data;
+  };
+
+  /**
+   * Takes an action based on what the user types
+   * @param inputValue
+   * @param InputActionMeta
+   * @returns the previous input value or nothing
+   */
+  const onInputChange = (
+    inputValue: string,
+    { action, prevInputValue }: InputActionMeta
+  ) => {
+    // create a set to check for characters which cause
+    // search to crash /\[]
+    let characters = new Set(["/", "\\", "[", "]"]);
+    if (characters.has(inputValue)) return;
+    // Prevent clearing value on blur
+    if (action !== "input-blur" && action !== "menu-close") {
+      setSearchValue(inputValue);
+      // user has typed a character inside text box
+      if (action === "input-change") {
+        // take input from text box to search for a food item
+        handleSearch(inputValue);
+      }
+    }
+    return prevInputValue;
+  };
+
+  /**
+   * Checks if the user has clicked the check to clear the input
+   * or when the has selected something.
+   * @param selectedOption
+   * @param param1
+   */
+  const onChange = (selectedOption: any, { action }) => {
+    if (action === "clear") {
+      setSearchValue("");
+    }
+    if (action === "select-option") {
+      // user has selected something from drop down menu
+      // grab fdcId here
+      setFdcId(selectedOption.value);
+      // go to food detail page
+      // this should happen when the user clicks mouse down
+      // or after the user hits enter
+      if (selectedOption.value)
+        router.push(`/foodItem/${selectedOption.value}`);
+    }
+  };
+
+  /**
+   * Displays a message when no matching foods were found.
+   * @param obj
+   * @returns
+   */
+  const noOptionsMessage = (obj: { inputValue: string }) => {
+    if (obj.inputValue.trim().length === 0) {
+      return null;
+    }
+    return "No matching food items.";
+  };
+
+  /**
+   * Sets loading to true. Uses searchQuery to perform search request.
+   * If a sucessfull response occurs, add the food description to the label
+   * and the fdcId number to the value of the options array of select box.
+   * fdcId is the number the USDA food number assigns to a specific food item
+   * @param searchQuery
+   */
+  const handleSearch = async (searchQuery: string) => {
+    setIsLoading(true);
+    let response = [];
+    try {
+      response = await performSearchRequest(searchQuery);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      const options: { label: string; value: number }[] = [];
+      response.foods.forEach((food: { description: string; fdcId: number }) => {
+        options.push({
+          label: food.description,
+          value: food.fdcId,
+        });
+      });
+      setFoodOptions(options);
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * If user types a carriage return and there is a valid fdcId number,
+   * go to the detail page for that food item.
+   *
+   * @param event
+   */
+  const onKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      if (fdcId > 0) {
+        router.push(`/foodItem/${fdcId}`);
+      }
+    }
+  };
+
   return (
-    <>
-      <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
+    <Container>
+      <Box
+        sx={{
+          my: 4,
+          justifyContent: "center",
+          alignItems: "center",
+          mx: "auto",
+          width: "50%",
+        }}
+      >
+        <Typography variant='h6' sx={{ mb: 1 }}>
+          Search for Nutrition Information
+        </Typography>
 
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
+        <Select
+          theme={(theme) => ({
+            ...theme,
+            borderRadius: 3,
+            colors: {
+              ...theme.colors,
+              primary: "#01579B",
+            },
+          })}
+          inputValue={searchValue}
+          onInputChange={onInputChange}
+          isLoading={isLoading}
+          defaultValue={{ value: 0, label: "Search for a food item..." }}
+          onChange={onChange}
+          options={foodOptions}
+          onMenuOpen={() => setMenuIsOpen(true)}
+          onMenuClose={() => setMenuIsOpen(false)}
+          noOptionsMessage={noOptionsMessage}
+          isClearable={true}
+          onKeyDown={onKeyDown}
+        />
+      </Box>
+      <Box
+        sx={{
+          my: 4,
+          justifyContent: "center",
+          alignItems: "center",
+          mx: "auto",
+          width: "50%",
+        }}
+      >
+        <Iframe
+          url='https://www.myplate.gov/widgets/myplate-plan-start/'
+          scrolling='no'
+          height='600px'
+          width='100%'
+        />
+      </Box>
+    </Container>
+  );
+}
 
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-    </>
-  )
+/**
+ * Fetches the data first before sending the page to the client
+ * Take the api key defined in the .env file and assign it to apikey.
+ * Since getStaticProps always runs on the server and never on the client,
+ * API_KEY will not exposed.
+ * @returns
+ */
+export function getStaticProps() {
+  return {
+    props: {
+      apikey: process.env.API_KEY,
+    },
+  };
 }
