@@ -17,7 +17,7 @@ import Box from "@mui/material/Box";
  * @param props
  * @returns Jsx for a detail page.
  */
-export default function FoodDetail(props) {
+export default function FoodDetail(props: { apikey: any }) {
   const router = useRouter();
   const foodItemID =
     typeof router.query?.id === "string" ? router.query.id : "";
