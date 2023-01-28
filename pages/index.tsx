@@ -19,7 +19,7 @@ import { IFoodOption } from "../utils/types";
  * @param props
  * @returns  jsx for Home page
  */
-export default function IndexPage(props) {
+export default function IndexPage(props: { apikey: string }) {
   const [searchValue, setSearchValue] = useState("");
   const [foodOptions, setFoodOptions] = useState<IFoodOption[]>([]);
   const [hasMounted, setHasMounted] = useState(false);
