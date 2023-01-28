@@ -93,25 +93,34 @@ export default function FoodDetail(props: { apikey: any }) {
     // https://stackoverflow.com/questions/67811109/how-to-flatten-nested-objects-in-typescript
     // take elements of foodDetail.labelNutrients array by destructing nested array
     // and flatten these elements to a new array
-    const foodNutrients: Nutrient[] = foodDetail.foodNutrients.map(
-      ({ amount, id, nutrient: { name, unitName } }) => ({
-        amount,
-        id,
-        name,
-        unitName,
-      })
-    );
+    let nutrients = Object.entries(foodDetail.foodNutrients);
+    const foodNutrients = nutrients.map((nutrient) => {
+      let e: any = nutrient[1];
+      let a: number = e.amount;
+      let n: string = e.nutrient.name;
+      let i: number = e.id;
+      let u: string = e.nutrient.unitName;
+      let obj: Nutrient = { amount: a, id: i, name: n, unitName: u };
+      return obj;
+    });
 
     //  grab portions for this food item
+    let foodPortions = Object.entries(foodDetail.foodPortions);
+    let fp: any;
+    let gw: number;
+    let pd: string;
+    let obj: Portion;
     if (foodDetail.dataType === "SR Legacy") {
       if (foodDetail.foodPortions) {
-        portions = foodDetail.foodPortions.map(
-          ({ gramWeight, amount, modifier }) => ({
-            gramWeight,
-            portionDescription: amount + " " + modifier,
-          })
-        );
+        portions = foodPortions.map((foodPortion) => {
+          fp = foodPortion[1];
+          gw = fp.gramWeight;
+          pd = fp.amount + " " + fp.modifier;
+          obj = { gramWeight: gw, portionDescription: pd };
+          return obj;
+        });
       } else {
+        // default amount is 100 grams
         portions[0] = {
           gramWeight: 100,
           portionDescription: "",
@@ -123,12 +132,13 @@ export default function FoodDetail(props: { apikey: any }) {
         portionDescription: "",
       };
     } else {
-      portions = foodDetail.foodPortions.map(
-        ({ gramWeight, portionDescription }) => ({
-          gramWeight,
-          portionDescription: portionDescription,
-        })
-      );
+      portions = foodPortions.map((foodPortion) => {
+        fp = foodPortion[1];
+        gw = fp.gramWeight;
+        pd = fp.portionDescription;
+        obj = { gramWeight: gw, portionDescription: pd };
+        return obj;
+      });
     }
 
     return (
