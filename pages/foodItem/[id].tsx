@@ -67,24 +67,15 @@ export default function FoodDetail(props: { apikey: any }) {
       );
     }
     if (foodDetail.dataType === "Branded") {
-      // convert foodDetail.labelNutrients to array
+      // convert foodDetail.labelNutrients object to array of objects
+      let entries = Object.entries(foodDetail.labelNutrients);
       // grab label nutrients from foodDetail
-      const labelKeyValues = Object.entries(foodDetail.labelNutrients).map(
-        ([key, value]) => {
-          return {
-            nutrient: key,
-            value: value,
-          };
-        }
-      );
-
-      // flatten value array of labelNutrients
-      const labelNutrients: LabelNutrient[] = labelKeyValues.map(
-        ({ nutrient, value: { value } }) => ({
-          nutrient,
-          value,
-        })
-      );
+      const labelNutrients = entries.map((entry) => {
+        let e: any = entry[1];
+        let n: string = entry[0];
+        let obj: LabelNutrient = { nutrient: n, value: e.value };
+        return obj;
+      });
 
       return (
         <div className='container'>
