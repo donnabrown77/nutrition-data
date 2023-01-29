@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Select, { InputActionMeta } from "react-select";
+import Select, { ActionMeta, InputActionMeta, SingleValue } from "react-select";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -81,19 +81,21 @@ export default function IndexPage(props: { apikey: string }) {
    * @param selectedOption
    * @param param1
    */
-  const onChange = (selectedOption: any, { action }) => {
-    if (action === "clear") {
+  const onChange = (
+    newValue: SingleValue<{ value: number; label: string }>,
+    actionMeta: ActionMeta<{ value: number; label: string }>
+  ) => {
+    if (actionMeta.action === "clear") {
       setSearchValue("");
     }
-    if (action === "select-option") {
+    if (actionMeta.action === "select-option") {
       // user has selected something from drop down menu
       // grab fdcId here
-      setFdcId(selectedOption.value);
+      setFdcId(newValue!.value);
       // go to food detail page
       // this should happen when the user clicks mouse down
       // or after the user hits enter
-      if (selectedOption.value)
-        router.push(`/foodItem/${selectedOption.value}`);
+      if (newValue) router.push(`/foodItem/${newValue.value}`);
     }
   };
 
