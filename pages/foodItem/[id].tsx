@@ -96,27 +96,27 @@ export default function FoodDetail(props: { apikey: any }) {
     let nutrients = Object.entries(foodDetail.foodNutrients);
     const foodNutrients = nutrients.map((nutrient) => {
       let e: any = nutrient[1];
-      let a: number = e.amount;
-      let n: string = e.nutrient.name;
-      let i: number = e.id;
-      let u: string = e.nutrient.unitName;
-      let obj: Nutrient = { amount: a, id: i, name: n, unitName: u };
+      let obj: Nutrient = {
+        amount: e.amount,
+        id: e.id,
+        name: e.nutrient.name,
+        unitName: e.nutrient.unitName,
+      };
       return obj;
     });
 
     //  grab portions for this food item
     let foodPortions = Object.entries(foodDetail.foodPortions);
     let fp: any;
-    let gw: number;
-    let pd: string;
     let obj: Portion;
     if (foodDetail.dataType === "SR Legacy") {
       if (foodDetail.foodPortions) {
         portions = foodPortions.map((foodPortion) => {
           fp = foodPortion[1];
-          gw = fp.gramWeight;
-          pd = fp.amount + " " + fp.modifier;
-          obj = { gramWeight: gw, portionDescription: pd };
+          obj = {
+            gramWeight: fp.gramWeight,
+            portionDescription: fp.amount + " " + fp.modifier,
+          };
           return obj;
         });
       } else {
@@ -134,9 +134,10 @@ export default function FoodDetail(props: { apikey: any }) {
     } else {
       portions = foodPortions.map((foodPortion) => {
         fp = foodPortion[1];
-        gw = fp.gramWeight;
-        pd = fp.portionDescription;
-        obj = { gramWeight: gw, portionDescription: pd };
+        obj = {
+          gramWeight: fp.gramWeight,
+          portionDescription: fp.portionDescription,
+        };
         return obj;
       });
     }
