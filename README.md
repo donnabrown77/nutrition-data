@@ -38,6 +38,9 @@ I used react query instead of useEffect to make the api call. The useEffect hook
 
 The biggest challenge I faced was figuring out how the USDA food database api worked. The documentation is poor. This link https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.1#/FDC/getFood is the documentation. There isn't a table that describes which number corresponds to which nutrient name in the GET /v/food/{fdcId} call. I typed in numbers in ascending order and then watched the response to get what nutrient name corresponded with which number.
 
+Features I hope to add:
+Add the fonts currently used for the nutritional labels.
+
 Here is the link to signup for an api key:
 https://fdc.nal.usda.gov/api-key-signup.html
 
