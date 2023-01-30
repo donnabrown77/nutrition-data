@@ -40,3 +40,6 @@ The biggest challenge I faced was figuring out how the USDA food database api wo
 
 Here is the link to signup for an api key:
 https://fdc.nal.usda.gov/api-key-signup.html
+
+Here is a live version:
+https://nutrition-data.vercel.app/
