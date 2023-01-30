@@ -8,8 +8,6 @@ import Box from "@mui/material/Box";
 import Iframe from "react-iframe";
 import { IFoodOption } from "../utils/types";
 
-// TODO add readme
-// https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/
 // https://fdc.nal.usda.gov/api-key-signup.html
 
 /**

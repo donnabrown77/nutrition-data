@@ -22,17 +22,21 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Nutrition Data
 
-To learn more about Next.js, take a look at the following resources:
+I built this project to learn more about React and Next.js and to get nutritional information about many foods from place.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Nutrition Data retrieves nutritional information about many foods from the USDA food database. These foods include fresh produce, meats, fish, dairy, and packaged foods.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## What I Learned
 
-## Deploy on Vercel
+React app structure with Next.js.
+How to make axios queries to an api using React Query.
+Material UI theme and how to extend a theme.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+I used react query instead of useEffect to make the api call. The useEffect hook runs after rendering the entire user interface. So the api call will start after completing the rendering of the UI. By using react query data can be fetched data and rendered in parallel.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The biggest challenge I faced was figuring out how the USDA food database api worked. The documentation is poor. This link https://app.swaggerhub.com/apis/fdcnal/food-data_central_api/1.0.1#/FDC/getFood is the documentation. There isn't a table that describes which number corresponds to which nutrient name in the GET /v/food/{fdcId} call. I typed in numbers in ascending order and then watched the response to get what nutrient name corresponded with which number.
+
+Here is the link to signup for an api key:
+https://fdc.nal.usda.gov/api-key-signup.html
